@@ -1,0 +1,17 @@
+{% extends 'auth/templates/base.html' %}
+
+{% block content %}
+<h1>Authentication for Votwee</h1>
+
+{% if user %}
+<p style="font-size: 1.4em;">
+    You are currently logged in as<br /><b>{{user.user_id}}</b> via <b>{{user.user_type}}</b>.
+</p>
+<p>
+    <a href="{% url auth.views.logout %}">logout</a>
+</p>
+
+{% else %}
+<a href="{% url auth.views.start system_name="twitter" %}{% if return_url %}?return_url={{return_url}}{% endif %}"><img border="0" src="{{MEDIA_URL}}signin-with-twitter.png" /></a>
+{% endif %}
+{% endblock %}
