@@ -52,4 +52,4 @@ def after(request):
   request.session['user'] = system.get_user_info_after_auth(request)
   
   return HttpResponseRedirect(request.session['auth_return_url'] or "/")
-
+  

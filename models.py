@@ -78,7 +78,11 @@ class User(db.Model):
     return self._get_type_and_id(self.user_type, self.user_id)
     
   @classmethod
-  def get_or_create(cls, user_type, user_id, name, info, token):
+  def get_by_type_and_id(cls, user_type, user_id):
+    return cls.get_by_key_name(cls._get_type_and_id(user_type, user_id))
+  
+  @classmethod
+  def get_or_create(cls, user_type, user_id, name=None, info=None, token=None):
     key_name = cls._get_type_and_id(user_type, user_id)
     return cls.get_or_insert(key_name, user_type = user_type, user_id = user_id, name=name, info=info, token=token)
     

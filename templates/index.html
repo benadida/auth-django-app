@@ -1,7 +1,7 @@
 {% extends 'auth/templates/base.html' %}
 
 {% block content %}
-<h1>Authentication for Votwee</h1>
+<h1>Authentication</h1>
 
 {% if user %}
 <p style="font-size: 1.4em;">
@@ -12,6 +12,13 @@
 </p>
 
 {% else %}
-<a href="{% url auth.views.start system_name="twitter" %}{% if return_url %}?return_url={{return_url}}{% endif %}"><img border="0" src="{{MEDIA_URL}}signin-with-twitter.png" /></a>
+<p>
+    <a href="{% url auth.views.start system_name="twitter" %}{% if return_url %}?return_url={{return_url}}{% endif %}"><img border="0" src="{{MEDIA_URL}}signin-with-twitter.png" /></a>
+</p>
+
+
+<p>
+    <a href="{% url auth.views.start system_name="password" %}{% if return_url %}?return_url={{return_url}}{% endif %}">password</a>
+</p>
 {% endif %}
 {% endblock %}

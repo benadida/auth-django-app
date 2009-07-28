@@ -8,7 +8,7 @@ from django.template import Context, Template, loader
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response
 
-from security import get_user
+from auth.security import get_user
 
 ##
 ## BASICS
@@ -26,6 +26,7 @@ def render_template(request, template_name, vars = {}):
   vars_with_user['user'] = get_user(request)
   vars_with_user['STATIC'] = '/static/auth'
   vars_with_user['MEDIA_URL'] = '/static/auth/'
+  vars_with_user['csrf_token'] = request.session['csrf_token']
   
   return render_to_response('auth/templates/%s.html' % template_name, vars_with_user)
   

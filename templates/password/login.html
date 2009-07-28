@@ -1,0 +1,21 @@
+{% extends 'auth/templates/base.html' %}
+
+{% block content %}
+<h1>Password Login</h1>
+
+{% if error %}
+<p style="border: 1px solid black; padding: 5px;">
+    {{error}}
+</p>
+{% endif %}
+
+<form class="prettyform" action="" method="POST" id="create_election_form">
+    <input type="hidden" name="csrf_token" value="{{csrf_token}}" />
+<table>
+    {{form.as_table}}
+</table>
+<div>
+<label for="">&nbsp;</label><input type="submit" value="Login" />
+</div>
+</form>
+{% endblock %}

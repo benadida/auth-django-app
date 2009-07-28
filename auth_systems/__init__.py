@@ -1,5 +1,6 @@
 
 AUTH_SYSTEMS = {}
 
-import twitter
+import twitter, password
 AUTH_SYSTEMS['twitter'] = twitter
+AUTH_SYSTEMS['password'] = password

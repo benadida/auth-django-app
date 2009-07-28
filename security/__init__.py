@@ -7,7 +7,7 @@ Ben Adida (ben@adida.net)
 # nicely update the wrapper function
 from functools import update_wrapper
 
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.core.exceptions import *
 from django.conf import settings
 
@@ -70,7 +70,7 @@ def get_api_client(request):
 def login_required(func):
   def login_required_wrapper(request, *args, **kw):
     if not (get_user(request) or get_api_client(request)):
-      return HttpResponseRedirect(settings.LOGIN_URL)
+      return HttpResponseRedirect(settings.LOGIN_URL + "?return_url=" + request.get_full_path())
   
     return func(request, *args, **kw)
 
@@ -89,13 +89,13 @@ def admin_required(func):
 
 # get the user
 def get_user(request):
+  # set up CSRF protection if needed
+  if not request.session.has_key('csrf_token') or type(request.session['csrf_token']) != str:
+    request.session['csrf_token'] = str(uuid.uuid4())
+    
   if request.session.has_key('user'):
     user = request.session['user']
 
-    # set up CSRF protection if needed
-    if not request.session.has_key('csrf_token') or type(request.session['csrf_token']) != str:
-      request.session['csrf_token'] = str(uuid.uuid4())
-      
     # find the user
     user_obj = User.get_or_create(user['type'], user['user_id'], user['name'], user['info'], user['token'])
     return user_obj
