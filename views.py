@@ -7,17 +7,23 @@ Ben Adida
 
 from django.http import *
 from django.core.urlresolvers import reverse
-from django.contrib import auth
 
 from view_utils import *
 
 from auth_systems import AUTH_SYSTEMS
+import auth
 
 def index(request):
   """
   the page from which one chooses how to log in.
   """
-  return render_template(request,'index', {'return_url' : request.GET.get('return_url', None)})
+  
+  user = get_user(request)
+  # single auth system?
+  if len(auth.ENABLED_AUTH_SYSTEMS) == 1 and not user:
+    return HttpResponseRedirect(reverse(start, args=[auth.ENABLED_AUTH_SYSTEMS[0]]))
+    
+  return render_template(request,'index', {'return_url' : request.GET.get('return_url', None), 'auth_systems' : auth.ENABLED_AUTH_SYSTEMS})
   
 def logout(request):
   """
@@ -27,7 +33,10 @@ def logout(request):
   request.session.delete()
   return HttpResponseRedirect(request.GET.get('return_url',reverse(index)))
   
-def start(request, system_name='twitter'):
+def start(request, system_name):
+  if not (system_name in auth.ENABLED_AUTH_SYSTEMS):
+    return HttpResponseRedirect(reverse(index))
+    
   request.session.save()
   
   # store in the session the name of the system used for auth
