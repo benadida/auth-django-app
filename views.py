@@ -29,8 +29,8 @@ def logout(request):
   """
   logout
   """
-  #del request.session['user']
-  request.session.delete()
+  # don't clear the session
+  del request.session['user']
   return HttpResponseRedirect(request.GET.get('return_url',reverse(index)))
   
 def start(request, system_name):
