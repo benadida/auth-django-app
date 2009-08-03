@@ -23,6 +23,9 @@ class LoginForm(forms.Form):
   username = forms.CharField(max_length=50)
   password = forms.CharField(widget=forms.PasswordInput(), max_length=100)
 
+def password_check(user, password):
+  return (user and user.info['password'] == password)
+  
 # the view for logging in
 def password_login_view(request):
   from auth.view_utils import *
@@ -39,7 +42,7 @@ def password_login_view(request):
 
     if form.is_valid():
       user = User.get_by_type_and_id('password', form.cleaned_data['username'])
-      if user and user.info['password'] == form.cleaned_data['password']:
+      if password_check(user, form.cleaned_data['password']):
         request.session['user'] = user
         return HttpResponseRedirect(reverse(after))
       else:
