@@ -7,6 +7,9 @@ from helios import utils
 
 from django.core.urlresolvers import reverse
 from django import forms
+from django.core.mail import send_mail
+from django.conf import settings
+from django.http import HttpResponseRedirect
 
 def create_user(username, password, name = None):
   from auth.models import User
@@ -50,6 +53,36 @@ def password_login_view(request):
   
   return render_template(request, 'password/login', {'form': form, 'error': error})
     
+def password_forgotten_view(request):
+  """
+  forgotten password view and submit.
+  includes return_url
+  """
+  from auth.view_utils import *
+  from auth.models import User
+
+  if request.method == "GET":
+    return render_template(request, 'password/forgot', {'return_url': request.GET.get('return_url', '')})
+  else:
+    username = request.POST['username']
+    return_url = request.POST['return_url']
+    
+    user = User.get_by_type_and_id('password', username)
+    
+    body = """
+
+This is a password reminder from Helios:
+
+Your username: %s
+Your password: %s
+
+--
+Helios
+""" % (user.user_id, user.info['password'])
+
+    send_mail('password reminder', body, settings.SERVER_EMAIL, ["%s <%s>" % (user.info['name'], user.info['email'])], fail_silently=False)
+    
+    return HttpResponseRedirect(return_url)
   
 def get_auth_url(request):
   return reverse(password_login_view)
