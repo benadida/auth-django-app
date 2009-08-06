@@ -10,6 +10,8 @@ from django.shortcuts import render_to_response
 
 from auth.security import get_user
 
+import auth
+
 ##
 ## BASICS
 ##
@@ -26,6 +28,7 @@ def render_template(request, template_name, vars = {}):
   vars_with_user['user'] = get_user(request)
   vars_with_user['STATIC'] = '/static/auth'
   vars_with_user['MEDIA_URL'] = '/static/auth/'
+  vars_with_user['TEMPLATE_BASE'] = auth.TEMPLATE_BASE
   vars_with_user['csrf_token'] = request.session['csrf_token']
   
   return render_to_response('auth/templates/%s.html' % template_name, vars_with_user)
