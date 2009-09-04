@@ -19,9 +19,13 @@ def index(request):
   """
   
   user = get_user(request)
+
   # single auth system?
   if len(auth.ENABLED_AUTH_SYSTEMS) == 1 and not user:
     return HttpResponseRedirect(reverse(start, args=[auth.ENABLED_AUTH_SYSTEMS[0]])+ '?return_url=' + request.GET.get('return_url', ''))
+
+  if auth.DEFAULT_AUTH_SYSTEM and not user:
+    return HttpResponseRedirect(reverse(start, args=[auth.DEFAULT_AUTH_SYSTEM])+ '?return_url=' + request.GET.get('return_url', ''))
     
   return render_template(request,'index', {'return_url' : request.GET.get('return_url', None), 'auth_systems' : auth.ENABLED_AUTH_SYSTEMS})
   
