@@ -33,8 +33,22 @@ def logout(request):
   """
   logout
   """
+
+  user = request.session['user']
+  
   # don't clear the session
   del request.session['user']
+
+  # if there was a user logged in, do some cleanup
+  if user:
+    auth_system = AUTH_SYSTEMS[user['type']]
+    
+    # does the auth system have a special logout procedure?
+    if has_attr(auth_system, 'do_logout'):
+      response = auth_system.do_logout(request)
+      if response:
+        return response
+  
   return HttpResponseRedirect(request.GET.get('return_url',reverse(index)))
   
 def start(request, system_name):
@@ -62,7 +76,10 @@ def after(request):
   system = AUTH_SYSTEMS[request.session['auth_system_name']]
   
   # get the user info
-  request.session['user'] = system.get_user_info_after_auth(request)
+  user = system.get_user_info_after_auth(request)
+
+  if user:
+    request.session['user'] = user
   
   return HttpResponseRedirect(request.session['auth_return_url'] or "/")
   
