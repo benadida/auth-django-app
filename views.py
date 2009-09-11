@@ -44,7 +44,7 @@ def logout(request):
     auth_system = AUTH_SYSTEMS[user['type']]
     
     # does the auth system have a special logout procedure?
-    if has_attr(auth_system, 'do_logout'):
+    if hasattr(auth_system, 'do_logout'):
       response = auth_system.do_logout(request)
       if response:
         return response
