@@ -9,7 +9,7 @@ https://sp.princeton.edu/oit/sdp/CAS/Wiki%20Pages/Python.aspx
 from helios import utils
 from django.http import *
 
-import sys, os, cgi, urllib, re
+import sys, os, cgi, urllib, urllib2, re
 
 CAS_URL= 'https://fed.princeton.edu/cas/'
 CAS_LOGOUT_URL = 'https://fed.princeton.edu/cas/logout?service=%s'
@@ -24,7 +24,52 @@ def _get_service_url(request):
   
 def get_auth_url(request):
   return CAS_URL + 'login?service=' + urllib.quote(_get_service_url(request))
-    
+
+def get_user_info(user_id):
+  url = 'http://dsml.princeton.edu/'
+  headers = {'SOAPAction': "#searchRequest", 'Content-Type': 'text/xml'}
+  
+  request_body = """<?xml version='1.0' encoding='UTF-8'?> 
+  <soap-env:Envelope 
+     xmlns:xsd='http://www.w3.org/2001/XMLSchema'
+     xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+     xmlns:soap-env='http://schemas.xmlsoap.org/soap/envelope/'> 
+     <soap-env:Body> 
+        <batchRequest xmlns='urn:oasis:names:tc:DSML:2:0:core'
+  requestID='searching'>
+        <searchRequest 
+           dn='o=Princeton University, c=US'
+           scope='wholeSubtree'
+           derefAliases='neverDerefAliases'
+           sizeLimit='200'> 
+              <filter>
+                   <equalityMatch name='uid'>
+                            <value>%s</value>
+                    </equalityMatch>
+               </filter>
+               <attributes>
+                       <attribute name="displayName"/>
+                       <attribute name="pustatus"/>
+               </attributes>
+        </searchRequest>
+       </batchRequest>
+     </soap-env:Body> 
+  </soap-env:Envelope>
+""" % user_id
+
+  req = urllib2.Request(url, request_body, headers)
+  response = urllib2.urlopen(req).read()
+  
+  # parse the result
+  from xml.dom.minidom import parseString
+  
+  response_doc = parseString(response)
+  
+  # get the value elements (a bit of a hack but no big deal)
+  values = response_doc.getElementsByTagName('value')
+  
+  return {'name' : values[0].firstChild.wholeText, 'category' : values[1].firstChild.wholeText}
+  
 def get_user_info_after_auth(request):
   ticket = request.GET.get('ticket', None)
   
@@ -42,7 +87,13 @@ def get_user_info_after_auth(request):
   if len(r) == 2 and re.match("yes", r[0]) != None:
     netid = r[1].strip()
     
-    return {'type': 'cas', 'user_id': netid, 'name': netid, 'info': None, 'token': None}
+    info = get_user_info(netid)
+    if info:
+      name = info['name']
+    else:
+      name = netid
+      
+    return {'type': 'cas', 'user_id': netid, 'name': name, 'info': info, 'token': None}
   else:
     return None
     
