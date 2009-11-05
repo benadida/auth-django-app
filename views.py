@@ -69,7 +69,10 @@ def start(request, system_name):
   # where to send the user to?
   auth_url = system.get_auth_url(request)
   
-  return HttpResponseRedirect(auth_url)
+  if auth_url:
+    return HttpResponseRedirect(auth_url)
+  else:
+    return HttpResponse("an error occurred trying to contact " + system_name +", try again later")
 
 def after(request):
   # which auth system were we using?
