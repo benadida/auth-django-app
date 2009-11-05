@@ -19,9 +19,13 @@ def index(request):
   """
   
   user = get_user(request)
+
   # single auth system?
   if len(auth.ENABLED_AUTH_SYSTEMS) == 1 and not user:
     return HttpResponseRedirect(reverse(start, args=[auth.ENABLED_AUTH_SYSTEMS[0]])+ '?return_url=' + request.GET.get('return_url', ''))
+
+  if auth.DEFAULT_AUTH_SYSTEM and not user:
+    return HttpResponseRedirect(reverse(start, args=[auth.DEFAULT_AUTH_SYSTEM])+ '?return_url=' + request.GET.get('return_url', ''))
     
   return render_template(request,'index', {'return_url' : request.GET.get('return_url', None), 'auth_systems' : auth.ENABLED_AUTH_SYSTEMS})
   
@@ -29,8 +33,22 @@ def logout(request):
   """
   logout
   """
+
+  user = request.session['user']
+  
   # don't clear the session
   del request.session['user']
+
+  # if there was a user logged in, do some cleanup
+  if user:
+    auth_system = AUTH_SYSTEMS[user['type']]
+    
+    # does the auth system have a special logout procedure?
+    if hasattr(auth_system, 'do_logout'):
+      response = auth_system.do_logout(request)
+      if response:
+        return response
+  
   return HttpResponseRedirect(request.GET.get('return_url',reverse(index)))
   
 def start(request, system_name):
@@ -61,7 +79,10 @@ def after(request):
   system = AUTH_SYSTEMS[request.session['auth_system_name']]
   
   # get the user info
-  request.session['user'] = system.get_user_info_after_auth(request)
+  user = system.get_user_info_after_auth(request)
+
+  if user:
+    request.session['user'] = user
   
   return HttpResponseRedirect(request.session['auth_return_url'] or "/")
   

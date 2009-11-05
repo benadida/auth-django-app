@@ -7,8 +7,7 @@ from oauthclient import client
 # FIXME: move this utils somewhere global, not in Helios
 from helios import utils
 
-CONSUMER_KEY = 'eKxAAH0YEvdTzGJJg9XEw'
-CONSUMER_SECRET = 'oDYN0ftaVcnU8yGV89QpEbg890JjXVZu25nAl2o'
+from twitterconfig import *
 
 def _get_new_client():
   return client.TwitterOAuthClient(CONSUMER_KEY, CONSUMER_SECRET)
