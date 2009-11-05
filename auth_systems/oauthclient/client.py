@@ -7,12 +7,13 @@ props to leahculver for making a very hard to use but in the end usable oauth li
 
 '''
 import httplib
-import urllib
+import urllib, urllib2
 import time
 import webbrowser
 import oauth as oauth
 from urlparse import urlparse
 
+from google.appengine.api import urlfetch
 
 class TwitterOAuthClient(oauth.OAuthClient):
     api_root_url = 'https://twitter.com' #for testing 'http://term.ie'
@@ -40,7 +41,6 @@ class TwitterOAuthClient(oauth.OAuthClient):
     def oauth_request(self,url, args = {}, method=None):
         if (method==None):
             if args=={}:
-
                 method = "GET"
             else:
                 method = "POST"
@@ -51,23 +51,6 @@ class TwitterOAuthClient(oauth.OAuthClient):
         elif (method == "POST"):
             return self.http_wrapper(req.get_normalized_http_url(),req.to_postdata())
 
-    # trying to make a more robust http wrapper. this is a failure ;)
-    def http_wrapper_fucked(self, url, postdata=""):
-        parsed_url = urlparse(url)
-        connection_url = parsed_url.path+"?"+parsed_url.query
-        hostname = parsed_url.hostname
-        scheme = parsed_url.scheme
-        headers = {'Content-Type' :'application/x-www-form-urlencoded'}
-        if scheme=="https":
-            connection  = httplib.HTTPSConnection(hostname)
-        else:
-            connection  = httplib.HTTPConnection(hostname)
-        connection.request("POST", connection_url, body=postdata, headers=headers)
-        connection_response = connection.getresponse()
-        self.last_http_status = connection_response.status
-        self.last_api_call= url
-        response= connection_response.read()
-
     #this is barely working. (i think. mostly it is that everyone else is using httplib) 
     def http_wrapper(self, url, postdata={}): 
         try:
@@ -77,6 +60,16 @@ class TwitterOAuthClient(oauth.OAuthClient):
                 f = urllib.urlopen(url) 
             response = f.read()
         except:
+            import traceback
+            import logging, sys
+            cla, exc, tb = sys.exc_info()
+            logging.error(url)
+            if postdata:
+              logging.error("with post data")
+            else:
+              logging.error("without post data")
+            logging.error(exc.args)
+            logging.error(traceback.format_tb(tb))
             response = ""
         return response 
     

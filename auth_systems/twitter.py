@@ -15,7 +15,11 @@ def _get_new_client():
 
 def get_auth_url(request):
   client = _get_new_client()
-  tok = client.get_request_token()
+  try:
+    tok = client.get_request_token()
+  except:
+    return None
+  
   request.session['request_token'] = tok
   url = client.get_authenticate_url(tok['oauth_token']) 
   return url
