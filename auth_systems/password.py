@@ -11,6 +11,8 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.http import HttpResponseRedirect
 
+import logging
+
 def create_user(username, password, name = None):
   from auth.models import User
   
