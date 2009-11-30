@@ -89,6 +89,40 @@ class User(db.Model):
   def update_status(self, status):
     if AUTH_SYSTEMS.has_key(self.user_type):
       AUTH_SYSTEMS[self.user_type].update_status(self.token, status)
+      
+  def send_message(self, subject, body):
+    if AUTH_SYSTEMS.has_key(self.user_type):
+      AUTH_SYSTEMS[self.user_type].send_message(self.user_id, self.info, subject, body)
+  
+  def is_eligible_for(self, eligibility_case):
+    """
+    Check if this user is eligible for this particular eligibility case, which looks like
+    {'auth_system': 'cas', 'constraint': [{}, {}, {}]}
+    and the constraints are OR'ed together
+    """
+    
+    if eligibility_case['auth_system'] != self.user_type:
+      return False
+      
+    # no constraint? Then eligible!
+    if not eligibility_case.has_key('constraint'):
+      return True
+    
+    # from here on we know we match the auth system, but do we match one of the constraints?  
+
+    auth_system = AUTH_SYSTEMS[self.user_type]
+
+    # does the auth system allow for checking a constraint?
+    if not hasattr(auth_system, 'check_constraint'):
+      return False
+      
+    for constraint in eligibility_case['constraint']:
+      # do we match on this constraint?
+      if auth_system.check_constraint(constraint=constraint, user_info = self.info):
+        return True
+  
+    # no luck
+    return False
     
   def __eq__(self, other):
     if other:

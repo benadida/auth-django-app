@@ -11,6 +11,7 @@ from django.http import *
 
 import sys, os, cgi, urllib, urllib2, re
 
+CAS_EMAIL_DOMAIN = "princeton.edu"
 CAS_URL= 'https://fed.princeton.edu/cas/'
 CAS_LOGOUT_URL = 'https://fed.princeton.edu/cas/logout?service=%s'
 
@@ -105,7 +106,28 @@ def do_logout(request):
   
 def update_status(token, message):
   """
-  post a message to the auth system's update stream, e.g. twitter stream
+  simple update
   """
-  # FIXME can't notify someone yet
   pass
+
+def send_message(user_id, user_info, subject, body):
+  """
+  send email, for now just to Princeton
+  """
+  # if the user_id contains an @ sign already
+  if "@" in user_id:
+    email = user_id
+  else:
+    email = "%s@%s" % (user_id, CAS_EMAIL_DOMAIN)
+    
+  if info.has_key('name'):
+    name = info["name"]
+  else:
+    name = email
+    
+  send_mail(subject, body, settings.SERVER_EMAIL, ["%s <%s>" % (name, email)], fail_silently=False)
+  
+def check_constraint(constraint, user_info):
+  if not user_info.has_key('category'):
+    return False
+  return constraint['year'] == user_info['category']

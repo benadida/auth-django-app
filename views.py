@@ -34,10 +34,12 @@ def logout(request):
   logout
   """
 
-  user = request.session['user']
+  user = None
+  if request.session.has_key('user'):
+    user = request.session['user']
   
-  # don't clear the session
-  del request.session['user']
+    # don't clear the session
+    del request.session['user']
 
   # if there was a user logged in, do some cleanup
   if user:

@@ -95,3 +95,10 @@ def get_user_info_after_auth(request):
     
 def update_status(token, message):
   pass
+  
+def send_message(user_id, user_info, subject, body):
+  if user_id == "benadida":
+    name = "Ben Test"
+    email = "ben-helios-test@adida.net"
+    send_mail(subject, body, settings.SERVER_EMAIL, ["%s <%s>" % (name, email)], fail_silently=False)
+    
