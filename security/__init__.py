@@ -97,7 +97,7 @@ def get_user(request):
     user = request.session['user']
 
     # find the user
-    user_obj = User.get_or_create(user['type'], user['user_id'], user['name'], user['info'], user['token'])
+    user_obj = User.get_by_type_and_id(user['type'], user['user_id'])
     return user_obj
   else:
     return None  

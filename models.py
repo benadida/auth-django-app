@@ -82,9 +82,22 @@ class User(db.Model):
     return cls.get_by_key_name(cls._get_type_and_id(user_type, user_id))
   
   @classmethod
-  def get_or_create(cls, user_type, user_id, name=None, info=None, token=None):
-    key_name = cls._get_type_and_id(user_type, user_id)
-    return cls.get_or_insert(key_name, user_type = user_type, user_id = user_id, name=name, info=info, token=token)
+  def update_or_create(cls, user_type, user_id, name=None, info=None, token=None):
+    def txn():
+      key_name = cls._get_type_and_id(user_type, user_id)
+      obj = cls.get_by_key_name(key_name)
+      if obj is None:
+        obj = cls(key_name = key_name, user_type = user_type, user_id = user_id, name = name, info = info, token = token)
+      else:
+        obj.info = info
+        obj.name = name
+        obj.token = token
+        
+      # save it
+      obj.put()
+      return obj
+    
+    return db.run_in_transaction(txn)      
     
   def update_status(self, status):
     if AUTH_SYSTEMS.has_key(self.user_type):

@@ -8,12 +8,21 @@ https://sp.princeton.edu/oit/sdp/CAS/Wiki%20Pages/Python.aspx
 # FIXME: move this utils somewhere global, not in Helios
 from helios import utils
 from django.http import *
+from django.core.mail import send_mail
+from django.conf import settings
 
 import sys, os, cgi, urllib, urllib2, re
+from xml.etree import ElementTree
 
 CAS_EMAIL_DOMAIN = "princeton.edu"
 CAS_URL= 'https://fed.princeton.edu/cas/'
 CAS_LOGOUT_URL = 'https://fed.princeton.edu/cas/logout?service=%s'
+
+# eligibility checking
+CAS_USERNAME = settings.CAS_USERNAME
+CAS_PASSWORD = settings.CAS_PASSWORD
+CAS_ELIGIBILITY_URL = settings.CAS_ELIGIBILITY_URL
+CAS_ELIGIBILITY_REALM = settings.CAS_ELIGIBILITY_REALM
 
 def _get_service_url(request):
   # FIXME current URL
@@ -26,6 +35,19 @@ def _get_service_url(request):
 def get_auth_url(request):
   return CAS_URL + 'login?service=' + urllib.quote(_get_service_url(request))
 
+def get_user_category(user_id):
+  theurl = CAS_ELIGIBILITY_URL % user_id
+
+  auth_handler = urllib2.HTTPBasicAuthHandler()
+  auth_handler.add_password(realm=CAS_ELIGIBILITY_REALM, uri= theurl, user= CAS_USERNAME, passwd = CAS_PASSWORD)
+  opener = urllib2.build_opener(auth_handler)
+  urllib2.install_opener(opener)
+  
+  result = urllib2.urlopen(CAS_ELIGIBILITY_URL % user_id).read().strip()
+  parsed_result = ElementTree.fromstring(result)
+  return parsed_result.text
+  
+  
 def get_user_info(user_id):
   url = 'http://dsml.princeton.edu/'
   headers = {'SOAPAction': "#searchRequest", 'Content-Type': 'text/xml'}
@@ -88,13 +110,10 @@ def get_user_info_after_auth(request):
   if len(r) == 2 and re.match("yes", r[0]) != None:
     netid = r[1].strip()
     
-    info = get_user_info(netid)
-    if info:
-      name = info['name']
-    else:
-      name = netid
+    category = get_user_category(netid)
+    info = {'name': netid, 'category': category}
       
-    return {'type': 'cas', 'user_id': netid, 'name': name, 'info': info, 'token': None}
+    return {'type': 'cas', 'user_id': netid, 'name': netid, 'info': info, 'token': None}
   else:
     return None
     
@@ -120,8 +139,8 @@ def send_message(user_id, user_info, subject, body):
   else:
     email = "%s@%s" % (user_id, CAS_EMAIL_DOMAIN)
     
-  if info.has_key('name'):
-    name = info["name"]
+  if user_info.has_key('name'):
+    name = user_info["name"]
   else:
     name = email
     

@@ -21,7 +21,7 @@ def create_user(username, password, name = None):
     raise Exception('user exists')
   
   info = {'password' : password, 'name': name}
-  user = User.get_or_create(user_type='password', user_id=username, info = info)
+  user = User.update_or_create(user_type='password', user_id=username, info = info)
   user.save()
 
 class LoginForm(forms.Form):

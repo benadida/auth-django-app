@@ -13,6 +13,8 @@ from view_utils import *
 from auth_systems import AUTH_SYSTEMS
 import auth
 
+from models import User
+
 def index(request):
   """
   the page from which one chooses how to log in.
@@ -84,6 +86,9 @@ def after(request):
   user = system.get_user_info_after_auth(request)
 
   if user:
+    # get the user and store any new data about him
+    user_obj = User.update_or_create(user['type'], user['user_id'], user['name'], user['info'], user['token'])
+    
     request.session['user'] = user
   
   return HttpResponseRedirect(request.session['auth_return_url'] or "/")
