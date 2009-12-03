@@ -89,6 +89,10 @@ def admin_required(func):
 
 # get the user
 def get_user(request):
+  # reduce session lifetime in case it was set too long
+  if request.session.get_expiry_age() > settings.SESSION_COOKIE_AGE:
+    request.session.set_expiry_age(settings.SESSION_COOKIE_AGE)
+  
   # set up CSRF protection if needed
   if not request.session.has_key('csrf_token') or type(request.session['csrf_token']) != str:
     request.session['csrf_token'] = str(uuid.uuid4())
