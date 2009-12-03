@@ -31,29 +31,45 @@ def index(request):
     
   return render_template(request,'index', {'return_url' : request.GET.get('return_url', None), 'auth_systems' : auth.ENABLED_AUTH_SYSTEMS})
   
+  
+def do_local_logout(request):
+  """
+  return the user in case you need to do something with it after logout
+  """
+  if request.session.has_key('user'):
+    user = request.session['user']
+    
+    # don't clear the session
+    del request.session['user']
+    
+    return user
+  
+  return None
+
+def do_remote_logout(request, user):
+  auth_system = AUTH_SYSTEMS[user['type']]
+  
+  # does the auth system have a special logout procedure?
+  if hasattr(auth_system, 'do_logout'):
+    response = auth_system.do_logout(request)
+    return response
+
+def do_complete_logout(request):
+  user = do_local_logout(request)
+  if user:
+    response = do_remote_logout(request, user)
+    return response
+  return None
+  
 def logout(request):
   """
   logout
   """
-
-  user = None
-  if request.session.has_key('user'):
-    user = request.session['user']
+  response = do_complete_logout(request)
+  if response:
+    return response
   
-    # don't clear the session
-    del request.session['user']
-
-  # if there was a user logged in, do some cleanup
-  if user:
-    auth_system = AUTH_SYSTEMS[user['type']]
-    
-    # does the auth system have a special logout procedure?
-    if hasattr(auth_system, 'do_logout'):
-      response = auth_system.do_logout(request)
-      if response:
-        return response
-  
-  return HttpResponseRedirect(request.GET.get('return_url',reverse(index)))
+  return HttpResponseRedirect(request.GET.get('return_url',"/"))
   
 def start(request, system_name):
   if not (system_name in auth.ENABLED_AUTH_SYSTEMS):
@@ -80,6 +96,10 @@ def start(request, system_name):
 
 def after(request):
   # which auth system were we using?
+  if not request.session.has_key('auth_system_name'):
+    do_local_logout(request)
+    return HttpResponseRedirect("/")
+    
   system = AUTH_SYSTEMS[request.session['auth_system_name']]
   
   # get the user info
@@ -90,6 +110,9 @@ def after(request):
     user_obj = User.update_or_create(user['type'], user['user_id'], user['name'], user['info'], user['token'])
     
     request.session['user'] = user
+  else:
+    # we were logging out
+    pass
   
   return HttpResponseRedirect(request.session['auth_return_url'] or "/")
-  
+
