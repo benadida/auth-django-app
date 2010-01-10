@@ -69,6 +69,9 @@ class User(db.Model):
   # access token information
   token = JSONProperty()
   
+  # administrator
+  admin_p = db.BooleanProperty(default=False)
+  
   @classmethod
   def _get_type_and_id(cls, user_type, user_id):
     return "%s:%s" % (user_type, user_id)    
