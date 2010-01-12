@@ -12,6 +12,8 @@ from auth.security import get_user
 
 import auth
 
+from django.conf import settings
+
 ##
 ## BASICS
 ##
@@ -21,15 +23,22 @@ SUCCESS = HttpResponse("SUCCESS")
 ##
 ## template abstraction
 ##
-def render_template(request, template_name, vars = {}):
-  t = loader.get_template(template_name + '.html')
-  
+
+def prepare_vars(request, vars):
   vars_with_user = vars.copy()
   vars_with_user['user'] = get_user(request)
   vars_with_user['STATIC'] = '/static/auth'
   vars_with_user['MEDIA_URL'] = '/static/auth/'
   vars_with_user['TEMPLATE_BASE'] = auth.TEMPLATE_BASE
   vars_with_user['csrf_token'] = request.session['csrf_token']
+  vars_with_user['settings'] = settings
+  
+  return vars_with_user
+  
+def render_template(request, template_name, vars = {}):
+  t = loader.get_template(template_name + '.html')
+  
+  vars_with_user = prepare_vars(request, vars)
   
   return render_to_response('auth/templates/%s.html' % template_name, vars_with_user)
   
