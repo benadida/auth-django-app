@@ -102,4 +102,4 @@ def send_message(user_id, user_info, subject, body):
   if user_info.has_key('email'):
     email = user_info['email']
     name = user_info.get('name', email)
-    send_mail(subject, body, settings.SERVER_EMAIL, ["%s <%s>" % (name, email)], fail_silently=False)    
+    send_mail(subject, body, "%s <%s>" % ("Helios Voting System", settings.SERVER_EMAIL), ["%s <%s>" % (name, email)], fail_silently=False)    
