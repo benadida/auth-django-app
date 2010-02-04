@@ -60,7 +60,7 @@ def password_forgotten_view(request):
   forgotten password view and submit.
   includes return_url
   """
-  from auth.view_utils import *
+  from auth.view_utils import render_template
   from auth.models import User
 
   if request.method == "GET":
