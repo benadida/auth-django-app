@@ -33,10 +33,10 @@ def password_check(user, password):
   
 # the view for logging in
 def password_login_view(request):
-  from auth.view_utils import *
-  from auth.views import *
+  from auth.view_utils import render_template
+  from auth.views import LoginForm
   from auth.models import User
-  from django.http import *
+  from django.http import HttpResponseRedirect
 
   error = None
   

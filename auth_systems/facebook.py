@@ -40,3 +40,6 @@ def update_status(token, message):
   """
   client = _get_new_client(session_key=token)
   ## FIXME: do the message
+  
+def send_message(user_id, user_info, subject, body):
+  pass
