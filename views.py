@@ -30,7 +30,12 @@ def index(request):
     return HttpResponseRedirect(reverse(start, args=[auth.DEFAULT_AUTH_SYSTEM])+ '?return_url=' + request.GET.get('return_url', ''))
     
   return render_template(request,'index', {'return_url' : request.GET.get('return_url', None), 'auth_systems' : auth.ENABLED_AUTH_SYSTEMS})
-  
+
+def login_box_raw(request, return_url='/'):
+  """
+  a chunk of HTML that shows the various login options
+  """
+  return render_template_raw(request, 'login_box', {'auth_systems': auth.ENABLED_AUTH_SYSTEMS, 'return_url': return_url})
   
 def do_local_logout(request):
   """
