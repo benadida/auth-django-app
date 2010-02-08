@@ -26,11 +26,15 @@ SUCCESS = HttpResponse("SUCCESS")
 
 def prepare_vars(request, vars):
   vars_with_user = vars.copy()
-  vars_with_user['user'] = get_user(request)
+  
+  if request:
+    vars_with_user['user'] = get_user(request)
+    vars_with_user['csrf_token'] = request.session['csrf_token']
+    
   vars_with_user['STATIC'] = '/static/auth'
   vars_with_user['MEDIA_URL'] = '/static/auth/'
   vars_with_user['TEMPLATE_BASE'] = auth.TEMPLATE_BASE
-  vars_with_user['csrf_token'] = request.session['csrf_token']
+  
   vars_with_user['settings'] = settings
   
   return vars_with_user
@@ -47,7 +51,7 @@ def render_template_raw(request, template_name, vars={}):
   
   vars_with_user = prepare_vars(request, vars)
   c = Context(vars_with_user)  
-  return HttpResponse(t.render(c))
+  return t.render(c)
 
 def render_json(json_txt):
   return HttpResponse(json_txt)
