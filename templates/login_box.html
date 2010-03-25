@@ -1,5 +1,11 @@
 {% for auth_system in auth_systems %}
 <p>
-    <a href="{% url auth.views.start system_name=auth_system %}?return_url={{return_url}}"><img border="0" src="/static/auth/login-icons/{{auth_system}}.png" alt="{{auth_system}}" /></a>
+    <a href="{% url auth.views.start system_name=auth_system %}?return_url={{return_url}}">
+{% ifequal auth_system "password" %}
+Password
+{% else %}
+<img border="0" src="/static/auth/login-icons/{{auth_system}}.png" alt="{{auth_system}}" />
+{% endifequal %}
+</a>
 </p>
 {% endfor %}
