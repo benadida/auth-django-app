@@ -1,4 +1,9 @@
-{% for auth_system in auth_systems %}
+{% if default_auth_system %}
+<p><a href="{% url auth.views.start system_name=default_auth_system %}?return_url={{return_url}}">
+{{default_auth_system_obj.LOGIN_MESSAGE}}
+</a></p>
+{% else %}
+{% for auth_system in enabled_auth_systems %}
 <p>
     <a href="{% url auth.views.start system_name=auth_system %}?return_url={{return_url}}">
 {% ifequal auth_system "password" %}
@@ -9,3 +14,4 @@ Password
 </a>
 </p>
 {% endfor %}
+{% endif %}

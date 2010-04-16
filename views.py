@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 
 from view_utils import *
 
+import auth_systems
 from auth_systems import AUTH_SYSTEMS
 import auth
 
@@ -26,16 +27,25 @@ def index(request):
   if len(auth.ENABLED_AUTH_SYSTEMS) == 1 and not user:
     return HttpResponseRedirect(reverse(start, args=[auth.ENABLED_AUTH_SYSTEMS[0]])+ '?return_url=' + request.GET.get('return_url', ''))
 
-  if auth.DEFAULT_AUTH_SYSTEM and not user:
-    return HttpResponseRedirect(reverse(start, args=[auth.DEFAULT_AUTH_SYSTEM])+ '?return_url=' + request.GET.get('return_url', ''))
-    
-  return render_template(request,'index', {'return_url' : request.GET.get('return_url', '/'), 'auth_systems' : auth.ENABLED_AUTH_SYSTEMS})
+  #if auth.DEFAULT_AUTH_SYSTEM and not user:
+  #  return HttpResponseRedirect(reverse(start, args=[auth.DEFAULT_AUTH_SYSTEM])+ '?return_url=' + request.GET.get('return_url', ''))
+  
+  default_auth_system_obj = None
+  if auth.DEFAULT_AUTH_SYSTEM:
+    default_auth_system_obj = auth_systems.AUTH_SYSTEMS[auth.DEFAULT_AUTH_SYSTEM]
+  return render_template(request,'index', {'return_url' : request.GET.get('return_url', '/'), 'enabled_auth_systems' : auth.ENABLED_AUTH_SYSTEMS,
+                          'default_auth_system': auth.DEFAULT_AUTH_SYSTEM, 'default_auth_system_obj': default_auth_system_obj})
 
 def login_box_raw(request, return_url='/'):
   """
   a chunk of HTML that shows the various login options
   """
-  return render_template_raw(request, 'login_box', {'auth_systems': auth.ENABLED_AUTH_SYSTEMS, 'return_url': return_url})
+  default_auth_system_obj = None
+  if auth.DEFAULT_AUTH_SYSTEM:
+    default_auth_system_obj = auth_systems.AUTH_SYSTEMS[auth.DEFAULT_AUTH_SYSTEM]
+  
+  return render_template_raw(request, 'login_box', {'enabled_auth_systems': auth.ENABLED_AUTH_SYSTEMS, 'return_url': return_url,
+                                'default_auth_system': auth.DEFAULT_AUTH_SYSTEM, 'default_auth_system_obj': default_auth_system_obj})
   
 def do_local_logout(request):
   """

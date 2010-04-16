@@ -24,6 +24,9 @@ CAS_PASSWORD = settings.CAS_PASSWORD
 CAS_ELIGIBILITY_URL = settings.CAS_ELIGIBILITY_URL
 CAS_ELIGIBILITY_REALM = settings.CAS_ELIGIBILITY_REALM
 
+# display tweaks
+LOGIN_MESSAGE = "Log in with my NetID"
+
 def _get_service_url(request):
   # FIXME current URL
   from auth.views import after
