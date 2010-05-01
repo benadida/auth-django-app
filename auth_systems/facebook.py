@@ -2,13 +2,17 @@
 Facebook Authentication
 """
 
-from facebookconfig import API_KEY, SECRET_KEY
+import logging
+
+try:
+  from facebookconfig import API_KEY, SECRET_KEY
+except:
+  logging.info("NO FACEBOOK CONFIG")
+  
 from facebookclient import Facebook
 
 # FIXME: move this utils somewhere global, not in Helios
 from helios import utils
-
-from twitterconfig import *
 
 def _get_new_client(session_key=None):
   fb = Facebook(API_KEY, SECRET_KEY)

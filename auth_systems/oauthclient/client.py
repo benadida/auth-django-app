@@ -13,8 +13,6 @@ import webbrowser
 import oauth as oauth
 from urlparse import urlparse
 
-from google.appengine.api import urlfetch
-
 class TwitterOAuthClient(oauth.OAuthClient):
     api_root_url = 'https://twitter.com' #for testing 'http://term.ie'
     api_root_port = "80"

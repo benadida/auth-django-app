@@ -7,7 +7,12 @@ from oauthclient import client
 # FIXME: move this utils somewhere global, not in Helios
 from helios import utils
 
-from twitterconfig import *
+import logging
+
+try:
+  from twitterconfig import *
+except:
+  logging.info("NO TWITTER CONFIG")
 
 def _get_new_client():
   return client.TwitterOAuthClient(CONSUMER_KEY, CONSUMER_SECRET)
