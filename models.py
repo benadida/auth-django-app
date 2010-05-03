@@ -25,7 +25,7 @@ class User(models.Model):
   info = JSONField()
   
   # access token information
-  token = JSONField()
+  token = JSONField(null = True)
   
   # administrator
   admin_p = models.BooleanField(default=False)
