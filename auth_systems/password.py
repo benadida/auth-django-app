@@ -46,8 +46,10 @@ def password_login_view(request):
     form = LoginForm(request.POST)
 
     if form.is_valid():
-      user = User.get_by_type_and_id('password', form.cleaned_data['username'])
-      if password_check(user, form.cleaned_data['password']):
+      username = form.cleaned_data['username'].strip()
+      password = form.cleaned_data['password'].strip()
+      user = User.get_by_type_and_id('password', username)
+      if password_check(user, password):
         request.session['user'] = user
         return HttpResponseRedirect(reverse(after))
       else:
