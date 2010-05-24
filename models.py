@@ -50,6 +50,10 @@ class User(models.Model):
     obj, created_p = cls.objects.get_or_create(user_type = user_type, user_id = user_id, defaults = {'name': name, 'info':info, 'token':token})
     
     if not created_p:
+      # special case the password: don't replace it if it exists
+      if obj.info.has_key('password'):
+        info['password'] = obj.info['password']
+
       obj.info = info
       obj.name = name
       obj.token = token
