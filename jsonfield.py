@@ -46,7 +46,7 @@ class JSONField(models.TextField):
         if value == "":
             return None
 
-        if value and self.json_type:
+        if value and (self.json_type or hasattr(value, 'toJSONDict')):
             value = value.toJSONDict()
 
         # if isinstance(value, dict):

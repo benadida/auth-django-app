@@ -105,3 +105,10 @@ class User(models.Model):
     else:
       return False
   
+
+  @property
+  def pretty_name(self):
+    if self.info.has_key('name'):
+      return self.info['name']
+    else:
+      return self.user_id
