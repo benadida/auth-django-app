@@ -61,7 +61,8 @@ def do_local_logout(request):
   
   return None
 
-def do_remote_logout(request, user):
+def do_remote_logout(request, user, return_url="/"):
+  # FIXME: do something with return_url
   auth_system = AUTH_SYSTEMS[user['type']]
   
   # does the auth system have a special logout procedure?
@@ -69,10 +70,10 @@ def do_remote_logout(request, user):
     response = auth_system.do_logout(request)
     return response
 
-def do_complete_logout(request):
+def do_complete_logout(request, return_url="/"):
   user = do_local_logout(request)
   if user:
-    response = do_remote_logout(request, user)
+    response = do_remote_logout(request, user, return_url)
     return response
   return None
   
@@ -80,11 +81,13 @@ def logout(request):
   """
   logout
   """
-  response = do_complete_logout(request)
+
+  return_url = request.GET.get('return_url',"/")
+  response = do_complete_logout(request, return_url)
   if response:
     return response
   
-  return HttpResponseRedirect(request.GET.get('return_url',"/"))
+  return HttpResponseRedirect(return_url)
   
 def start(request, system_name):
   if not (system_name in auth.ENABLED_AUTH_SYSTEMS):
