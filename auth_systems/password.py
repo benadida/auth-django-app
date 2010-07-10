@@ -48,12 +48,14 @@ def password_login_view(request):
     if form.is_valid():
       username = form.cleaned_data['username'].strip()
       password = form.cleaned_data['password'].strip()
-      user = User.get_by_type_and_id('password', username)
-      if password_check(user, password):
-        request.session['user'] = user
-        return HttpResponseRedirect(reverse(after))
-      else:
-        error = 'Bad Username or Password'
+      try:
+        user = User.get_by_type_and_id('password', username)
+        if password_check(user, password):
+          request.session['user'] = user
+          return HttpResponseRedirect(reverse(after))
+      except User.DoesNotExist:
+        pass
+      error = 'Bad Username or Password'
   
   return render_template(request, 'password/login', {'form': form, 'error': error})
     
