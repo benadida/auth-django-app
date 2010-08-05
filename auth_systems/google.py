@@ -45,7 +45,6 @@ def send_message(user_id, user_info, subject, body):
   """
   send email, for now just to Princeton
   """
-  # if the user_id contains an @ sign already
   send_mail(subject, body, settings.SERVER_EMAIL, ["%s <%s>" % (user_id, user_id)], fail_silently=False)
   
 def check_constraint(constraint, user_info):
