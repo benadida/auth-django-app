@@ -4,10 +4,9 @@ Facebook Authentication
 
 import logging
 
-try:
-  from facebookconfig import API_KEY, SECRET_KEY
-except:
-  logging.info("NO FACEBOOK CONFIG")
+from django.conf import settings
+API_KEY = settings['FACEBOOK_API_KEY']
+API_SECRET = settings['FACEBOOK_API_SECRET']
   
 from facebookclient import Facebook
 
@@ -15,7 +14,7 @@ from facebookclient import Facebook
 from helios import utils
 
 def _get_new_client(session_key=None):
-  fb = Facebook(API_KEY, SECRET_KEY)
+  fb = Facebook(API_KEY, API_SECRET)
   if session_key:
     fb.session_key = session_key
   return fb

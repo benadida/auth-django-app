@@ -9,13 +9,18 @@ from helios import utils
 
 import logging
 
-try:
-  from twitterconfig import *
-except:
-  logging.info("NO TWITTER CONFIG")
+from django.conf import settings
+API_KEY = settings['TWITTER_API_KEY']
+API_SECRET = settings['TWITTER_API_SECRET']
 
-def _get_new_client():
-  return client.TwitterOAuthClient(CONSUMER_KEY, CONSUMER_SECRET)
+def _get_new_client(token=None, token_secret=None):
+  if token:
+    return client.TwitterOAuthClient(API_KEY, API_SECRET, token, token_secret)
+  else:
+    return client.TwitterOAuthClient(API_KEY, API_SECRET)
+
+def _get_client_by_token(token):
+  return _get_new_client(token['oauth_token'], token['oauth_token_secret'])
 
 def get_auth_url(request):
   client = _get_new_client()
@@ -30,7 +35,7 @@ def get_auth_url(request):
     
 def get_user_info_after_auth(request):
   tok = request.session['request_token']
-  twitter_client = client.TwitterOAuthClient(CONSUMER_KEY, CONSUMER_SECRET, tok['oauth_token'], tok['oauth_token_secret'])
+  twitter_client = _get_client_by_token(tok)
   access_token = twitter_client.get_access_token()
   request.session['access_token'] = access_token
     
@@ -45,9 +50,6 @@ def _get_client_by_request(request):
   access_token = request.session['access_token']
   return _get_client_by_token(access_token)
   
-def _get_client_by_token(token):
-  return client.TwitterOAuthClient(CONSUMER_KEY, CONSUMER_SECRET, token['oauth_token'], token['oauth_token_secret'])
-
 def update_status(token, message):
   """
   post a message to the auth system's update stream, e.g. twitter stream
