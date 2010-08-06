@@ -75,7 +75,7 @@ class User(models.Model):
 
   def update_status(self, status):
     if AUTH_SYSTEMS.has_key(self.user_type):
-      AUTH_SYSTEMS[self.user_type].update_status(self.token, status)
+      AUTH_SYSTEMS[self.user_type].update_status(self.user_id, self.info, self.token, status)
       
   def send_message(self, subject, body):
     if AUTH_SYSTEMS.has_key(self.user_type):

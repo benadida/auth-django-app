@@ -105,7 +105,8 @@ def start(request, system_name):
   system = AUTH_SYSTEMS[system_name]  
   
   # where to send the user to?
-  auth_url = system.get_auth_url(request)
+  redirect_url = "%s%s" % (settings.URL_HOST,reverse(after))
+  auth_url = system.get_auth_url(request, redirect_url=redirect_url)
   
   if auth_url:
     return HttpResponseRedirect(auth_url)

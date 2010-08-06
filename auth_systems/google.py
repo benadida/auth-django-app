@@ -20,15 +20,17 @@ LOGIN_MESSAGE = "Log in with my Google Account"
 OPENID_ENDPOINT = 'https://www.google.com/accounts/o8/id'
 
 # FIXME!
-TRUST_ROOT = 'http://localhost:8000'
-RETURN_TO = 'http://localhost:8000/auth/after'
+# TRUST_ROOT = 'http://localhost:8000'
+# RETURN_TO = 'http://localhost:8000/auth/after'
 
-def get_auth_url(request):
-  url = view_helpers.start_openid(request.session, OPENID_ENDPOINT, TRUST_ROOT, RETURN_TO)
+def get_auth_url(request, redirect_url):
+  # FIXME?? TRUST_ROOT should be diff than return_url?
+  request.session['google_redirect_url'] = redirect_url
+  url = view_helpers.start_openid(request.session, OPENID_ENDPOINT, redirect_url, redirect_url)
   return url
 
 def get_user_info_after_auth(request):
-  data = view_helpers.finish_openid(request.session, request.GET, RETURN_TO)
+  data = view_helpers.finish_openid(request.session, request.GET, request.session['google_redirect_url'])
 
   return {'type' : 'google', 'user_id': data['ax']['email'][0], 'name': "%s %s" % (data['ax']['firstname'][0], data['ax']['lastname'][0]), 'info': {}, 'token':{}}
     

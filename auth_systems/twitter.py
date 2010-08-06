@@ -27,7 +27,7 @@ def _get_new_client(token=None, token_secret=None):
 def _get_client_by_token(token):
   return _get_new_client(token['oauth_token'], token['oauth_token_secret'])
 
-def get_auth_url(request):
+def get_auth_url(request, redirect_url):
   client = _get_new_client()
   try:
     tok = client.get_request_token()
@@ -55,7 +55,7 @@ def _get_client_by_request(request):
   access_token = request.session['access_token']
   return _get_client_by_token(access_token)
   
-def update_status(token, message):
+def update_status(user_id, user_info, token, message):
   """
   post a message to the auth system's update stream, e.g. twitter stream
   """
