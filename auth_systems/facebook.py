@@ -20,11 +20,18 @@ STATUS_UPDATE_WORDING_TEMPLATE = "Send %s to my facebook status"
 from helios import utils
 
 def facebook_url(url, params):
-  return "https://graph.facebook.com%s?%s" % (url, urllib.urlencode(params))
+  if params:
+    return "https://graph.facebook.com%s?%s" % (url, urllib.urlencode(params))
+  else:
+    return "https://graph.facebook.com%s" % url
 
 def facebook_get(url, params):
   full_url = facebook_url(url,params)
   return urllib2.urlopen(full_url).read()
+
+def facebook_post(url, params):
+  full_url = facebook_url(url, None)
+  return urllib2.urlopen(full_url, urllib.urlencode(params)).read()
 
 def _get_new_client(session_key=None):
   fb = Facebook(API_KEY, API_SECRET)
@@ -49,7 +56,6 @@ def get_user_info_after_auth(request):
 
   access_token = cgi.parse_qs(args)['access_token'][0]
 
-  import pdb; pdb.set_trace()
   info = utils.from_json(facebook_get('/me', {'access_token':access_token}))
 
   return {'type': 'facebook', 'user_id' : info['id'], 'name': info['name'], 'info': info, 'token': {'access_token': access_token}}
@@ -58,7 +64,7 @@ def update_status(user_id, user_info, token, message):
   """
   post a message to the auth system's update stream, e.g. twitter stream
   """
-  result = facebook_get('/me/feed', {
+  result = facebook_post('/me/feed', {
       'access_token': token['access_token'],
       'message': message
       })
