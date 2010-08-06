@@ -14,6 +14,8 @@ import auth_systems
 from auth_systems import AUTH_SYSTEMS
 import auth
 
+import copy
+
 from models import User
 
 def index(request):
@@ -36,7 +38,7 @@ def index(request):
   return render_template(request,'index', {'return_url' : request.GET.get('return_url', '/'), 'enabled_auth_systems' : auth.ENABLED_AUTH_SYSTEMS,
                           'default_auth_system': auth.DEFAULT_AUTH_SYSTEM, 'default_auth_system_obj': default_auth_system_obj})
 
-def login_box_raw(request, return_url='/'):
+def login_box_raw(request, return_url='/', auth_systems = None):
   """
   a chunk of HTML that shows the various login options
   """
@@ -44,8 +46,11 @@ def login_box_raw(request, return_url='/'):
   if auth.DEFAULT_AUTH_SYSTEM:
     default_auth_system_obj = auth_systems.AUTH_SYSTEMS[auth.DEFAULT_AUTH_SYSTEM]
   
-  return render_template_raw(request, 'login_box', {'enabled_auth_systems': auth.ENABLED_AUTH_SYSTEMS, 'return_url': return_url,
-                                'default_auth_system': auth.DEFAULT_AUTH_SYSTEM, 'default_auth_system_obj': default_auth_system_obj})
+  enabled_auth_systems = auth_systems or auth.ENABLED_AUTH_SYSTEMS
+
+  return render_template_raw(request, 'login_box', {
+      'enabled_auth_systems': enabled_auth_systems, 'return_url': return_url,
+      'default_auth_system': auth.DEFAULT_AUTH_SYSTEM, 'default_auth_system_obj': default_auth_system_obj})
   
 def do_local_logout(request):
   """
