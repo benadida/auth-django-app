@@ -13,6 +13,10 @@ from django.http import HttpResponseRedirect
 
 import logging
 
+# some parameters to indicate that status updating is possible
+STATUS_UPDATES = False
+
+
 def create_user(username, password, name = None):
   from auth.models import User
   

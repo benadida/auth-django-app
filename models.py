@@ -61,6 +61,18 @@ class User(models.Model):
 
     return obj
     
+  def can_update_status(self):
+    if not AUTH_SYSTEMS.has_key(self.user_type):
+      return False
+
+    return AUTH_SYSTEMS[self.user_type].STATUS_UPDATES
+
+  def update_status_template(self):
+    if not self.can_update_status():
+      return None
+
+    return AUTH_SYSTEMS[self.user_type].STATUS_UPDATE_WORDING_TEMPLATE
+
   def update_status(self, status):
     if AUTH_SYSTEMS.has_key(self.user_type):
       AUTH_SYSTEMS[self.user_type].update_status(self.token, status)

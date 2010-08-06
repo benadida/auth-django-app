@@ -10,8 +10,13 @@ from helios import utils
 import logging
 
 from django.conf import settings
-API_KEY = settings['TWITTER_API_KEY']
-API_SECRET = settings['TWITTER_API_SECRET']
+API_KEY = settings.TWITTER_API_KEY
+API_SECRET = settings.TWITTER_API_SECRET
+
+# some parameters to indicate that status updating is possible
+STATUS_UPDATES = True
+STATUS_UPDATE_WORDING_TEMPLATE = "Tweet %s"
+
 
 def _get_new_client(token=None, token_secret=None):
   if token:
@@ -56,3 +61,7 @@ def update_status(token, message):
   """
   twitter_client = _get_client_by_token(token)
   result = twitter_client.oauth_request('https://twitter.com/statuses/update.xml', args={'status': message}, method='POST')
+
+def send_message(user_id, user_info, subject, body):
+  # FIXME: do we DM here?
+  pass

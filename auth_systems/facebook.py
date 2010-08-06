@@ -5,10 +5,14 @@ Facebook Authentication
 import logging
 
 from django.conf import settings
-API_KEY = settings['FACEBOOK_API_KEY']
-API_SECRET = settings['FACEBOOK_API_SECRET']
+API_KEY = settings.FACEBOOK_API_KEY
+API_SECRET = settings.FACEBOOK_API_SECRET
   
 from facebookclient import Facebook
+
+# some parameters to indicate that status updating is possible
+STATUS_UPDATES = True
+STATUS_UPDATE_WORDING_TEMPLATE = "Send %s to my facebook status"
 
 # FIXME: move this utils somewhere global, not in Helios
 from helios import utils
@@ -45,4 +49,5 @@ def update_status(token, message):
   ## FIXME: do the message
   
 def send_message(user_id, user_info, subject, body):
+  # FIXME: do we DM here?
   pass

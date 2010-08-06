@@ -12,6 +12,9 @@ from xml.etree import ElementTree
 
 from openid import view_helpers
 
+# some parameters to indicate that status updating is not possible
+STATUS_UPDATES = False
+
 # display tweaks
 LOGIN_MESSAGE = "Log in with my Google Account"
 OPENID_ENDPOINT = 'https://www.google.com/accounts/o8/id'
