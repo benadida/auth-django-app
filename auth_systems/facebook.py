@@ -14,7 +14,7 @@ import urllib, urllib2, cgi
 
 # some parameters to indicate that status updating is possible
 STATUS_UPDATES = True
-STATUS_UPDATE_WORDING_TEMPLATE = "Send %s to my facebook status"
+STATUS_UPDATE_WORDING_TEMPLATE = "Send %s to your facebook status"
 
 # FIXME: move this utils somewhere global, not in Helios
 from helios import utils
