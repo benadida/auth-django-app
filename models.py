@@ -128,3 +128,15 @@ class User(models.Model):
       return self.info['name']
 
     return self.user_id
+  
+  def _display_html(self, size):
+    return """<img border="0" height="%s" src="/static/auth/login-icons/%s.png" alt="%s" /> %s""" % (
+      str(int(size)), self.user_type, self.user_type, self.pretty_name)
+
+  @property
+  def display_html_small(self):
+    return self._display_html(15)
+
+  @property
+  def display_html_big(self):
+    return self._display_html(25)

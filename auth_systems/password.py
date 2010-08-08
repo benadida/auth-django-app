@@ -94,7 +94,7 @@ Helios
     
     return HttpResponseRedirect(return_url)
   
-def get_auth_url(request):
+def get_auth_url(request, redirect_url = None):
   return reverse(password_login_view)
     
 def get_user_info_after_auth(request):
