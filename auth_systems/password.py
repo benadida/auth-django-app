@@ -55,6 +55,12 @@ def password_login_view(request):
       try:
         user = User.get_by_type_and_id('password', username)
         if password_check(user, password):
+          # set this in case we came here from another location than 
+          # the normal login process
+          request.session['auth_system_name'] = 'password'
+          if request.POST.has_key('return_url'):
+            request.session['auth_return_url'] = request.POST.get('return_url')
+
           request.session['user'] = user
           return HttpResponseRedirect(reverse(after))
       except User.DoesNotExist:
@@ -110,4 +116,4 @@ def send_message(user_id, user_info, subject, body):
   if user_info.has_key('email'):
     email = user_info['email']
     name = user_info.get('name', email)
-    send_mail(subject, body, "%s <%s>" % ("Helios Voting System", settings.SERVER_EMAIL), ["%s <%s>" % (name, email)], fail_silently=False)    
+    send_mail(subject, body, settings.SERVER_EMAIL, ["%s <%s>" % (name, email)], fail_silently=False)    

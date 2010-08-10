@@ -4,11 +4,19 @@
 </a></p>
 {% else %}
 {% for auth_system in enabled_auth_systems %}
+{% ifequal auth_system "password" %}
+<form method="post" action="{% url auth.auth_systems.password.password_login_view %}">
+<input type="hidden" name="election_uuid" value="{{election.uuid}}" />
+<input type="hidden" name="csrf_token" value="{{csrf_token}}" />
+<input type="hidden" name="return_url" value="{{return_url}}" />
+<table>
+    {{form.as_table}}
+</table>
+<input type="submit" value="log in" />
+</form>
+{% else %}
 <p>
     <a href="{% url auth.views.start system_name=auth_system %}?return_url={{return_url}}" style="font-size: 1.4em;">
-{% ifequal auth_system "password" %}
-Password
-{% else %}
 <img border="0" height="35" src="/static/auth/login-icons/{{auth_system}}.png" alt="{{auth_system}}" /> {{auth_system}}
 {% endifequal %}
 </a>

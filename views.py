@@ -12,6 +12,7 @@ from view_utils import *
 
 import auth_systems
 from auth_systems import AUTH_SYSTEMS
+from auth_systems import password
 import auth
 
 import copy
@@ -48,9 +49,12 @@ def login_box_raw(request, return_url='/', auth_systems = None):
   
   enabled_auth_systems = auth_systems or auth.ENABLED_AUTH_SYSTEMS
 
+  form = password.LoginForm()
+
   return render_template_raw(request, 'login_box', {
       'enabled_auth_systems': enabled_auth_systems, 'return_url': return_url,
-      'default_auth_system': auth.DEFAULT_AUTH_SYSTEM, 'default_auth_system_obj': default_auth_system_obj})
+      'default_auth_system': auth.DEFAULT_AUTH_SYSTEM, 'default_auth_system_obj': default_auth_system_obj,
+      'form' : form})
   
 def do_local_logout(request):
   """
