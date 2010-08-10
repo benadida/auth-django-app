@@ -36,8 +36,14 @@ def index(request):
   default_auth_system_obj = None
   if auth.DEFAULT_AUTH_SYSTEM:
     default_auth_system_obj = auth_systems.AUTH_SYSTEMS[auth.DEFAULT_AUTH_SYSTEM]
-  return render_template(request,'index', {'return_url' : request.GET.get('return_url', '/'), 'enabled_auth_systems' : auth.ENABLED_AUTH_SYSTEMS,
-                          'default_auth_system': auth.DEFAULT_AUTH_SYSTEM, 'default_auth_system_obj': default_auth_system_obj})
+
+  form = password.LoginForm()
+
+  return render_template(request,'index', {'return_url' : request.GET.get('return_url', '/'),
+                                           'enabled_auth_systems' : auth.ENABLED_AUTH_SYSTEMS,
+                                           'default_auth_system': auth.DEFAULT_AUTH_SYSTEM,
+                                           'default_auth_system_obj': default_auth_system_obj,
+                                           'form' : form})
 
 def login_box_raw(request, return_url='/', auth_systems = None):
   """
