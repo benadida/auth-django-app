@@ -96,6 +96,7 @@ Your password: %s
 Helios
 """ % (user.user_id, user.info['password'])
 
+    # FIXME: make this a task
     send_mail('password reminder', body, settings.SERVER_EMAIL, ["%s <%s>" % (user.info['name'], user.info['email'])], fail_silently=False)
     
     return HttpResponseRedirect(return_url)

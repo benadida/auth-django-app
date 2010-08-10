@@ -13,6 +13,7 @@
     {{form.as_table}}
 </table>
 <input type="submit" value="log in" />
+<a style="font-size: 0.8em;" href="{% url auth.auth_systems.password.password_forgotten_view %}?return_url={{return_url|urlencode}}">forgot password?</a>
 </form>
 {% else %}
 <p>

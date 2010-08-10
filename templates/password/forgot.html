@@ -1,7 +1,10 @@
-{% extends 'auth/templates/base.html' %}
+{% extends TEMPLATE_BASE %}
+
+{% block header %}
+<h2>{{ settings.SITE_TITLE }} &mdash; Password Forgotten</h2>
+{% endblock %}
 
 {% block content %}
-<h1>Password Forgotten</h1>
 
 {% if error %}
 <p style="border: 1px solid black; padding: 5px;">
