@@ -30,6 +30,7 @@ def prepare_vars(request, vars):
   if request:
     vars_with_user['user'] = get_user(request)
     vars_with_user['csrf_token'] = request.session['csrf_token']
+    vars_with_user['SECURE_URL_HOST'] = settings.SECURE_URL_HOST
     
   vars_with_user['STATIC'] = '/static/auth'
   vars_with_user['MEDIA_URL'] = '/static/auth/'
