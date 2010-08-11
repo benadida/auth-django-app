@@ -64,6 +64,11 @@ class UserTests(unittest.TestCase):
         for auth_system, auth_system_module in AUTH_SYSTEMS.iteritems():
             u = models.User.update_or_create(user_type = auth_system, user_id = 'foobar_status_update', info={'name':'Foo Bar Status Update'})
 
-    def test_eq(self):
-        pass
+            self.assertTrue(u.is_eligible_for({'auth_system': auth_system}))
 
+    def test_eq(self):
+        for auth_system, auth_system_module in AUTH_SYSTEMS.iteritems():
+            u = models.User.update_or_create(user_type = auth_system, user_id = 'foobar_eq', info={'name':'Foo Bar Status Update'})
+            u2 = models.User.update_or_create(user_type = auth_system, user_id = 'foobar_eq', info={'name':'Foo Bar Status Update'})
+
+            self.assertEquals(u, u2)
