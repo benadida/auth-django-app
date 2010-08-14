@@ -17,6 +17,8 @@ import uuid
 
 from auth.models import *
 
+FIELDS_TO_SAVE = 'FIELDS_TO_SAVE'
+
 ## FIXME: oauth is NOT working right now
 
 ##
@@ -95,7 +97,7 @@ def get_user(request):
   # set up CSRF protection if needed
   if not request.session.has_key('csrf_token') or type(request.session['csrf_token']) != str:
     request.session['csrf_token'] = str(uuid.uuid4())
-    
+
   if request.session.has_key('user'):
     user = request.session['user']
 
@@ -111,3 +113,11 @@ def check_csrf(request):
     
   if (not request.POST.has_key('csrf_token')) or (request.POST['csrf_token'] != request.session['csrf_token']):
     raise Exception("A CSRF problem was detected")
+
+def save_in_session_across_logouts(request, field_name, field_value):
+  fields_to_save = request.session.get(FIELDS_TO_SAVE, [])
+  if field_name not in fields_to_save:
+    fields_to_save.append(field_name)
+    request.session[FIELDS_TO_SAVE] = fields_to_save
+
+  request.session[field_name] = field_value

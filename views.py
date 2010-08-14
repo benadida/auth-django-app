@@ -19,6 +19,8 @@ import copy
 
 from models import User
 
+from security import FIELDS_TO_SAVE
+
 def index(request):
   """
   the page from which one chooses how to log in.
@@ -64,17 +66,32 @@ def login_box_raw(request, return_url='/', auth_systems = None):
   
 def do_local_logout(request):
   """
-  return the user in case you need to do something with it after logout
+  if there is a logged-in user, it is saved in the new session's "user_for_remote_logout"
+  variable.
   """
+
+  user = None
+
   if request.session.has_key('user'):
     user = request.session['user']
     
-    # don't clear the session
-    del request.session['user']
-    
-    return user
-  
-  return None
+  # 2010-08-14 be much more aggressive here
+  # we save a few fields across session renewals,
+  # but we definitely kill the session and renew
+  # the cookie
+  field_names_to_save = request.session.get(FIELDS_TO_SAVE, [])
+  fields_to_save = dict([(name, request.session.get(name, None)) for name in field_names_to_save])
+
+  # let's not forget to save the list of fields to save
+  field_names_to_save.append(FIELDS_TO_SAVE)
+  fields_to_save[FIELDS_TO_SAVE] = field_names_to_save
+
+  request.session.flush()
+
+  for name in field_names_to_save:
+    request.session[name] = fields_to_save[name]
+
+  request.session['user_for_remote_logout'] = user
 
 def do_remote_logout(request, user, return_url="/"):
   # FIXME: do something with return_url
@@ -82,13 +99,14 @@ def do_remote_logout(request, user, return_url="/"):
   
   # does the auth system have a special logout procedure?
   if hasattr(auth_system, 'do_logout'):
-    response = auth_system.do_logout(request)
+    response = auth_system.do_logout(request.session.get('user_for_remote_logout', None))
     return response
 
 def do_complete_logout(request, return_url="/"):
-  user = do_local_logout(request)
-  if user:
-    response = do_remote_logout(request, user, return_url)
+  do_local_logout(request)
+  user_for_remote_logout = request.session.get('user_for_remote_logout', None)
+  if user_for_remote_logout:
+    response = do_remote_logout(request, user_for_remote_logout, return_url)
     return response
   return None
   

@@ -28,7 +28,7 @@ if hasattr(settings, 'CAS_USERNAME'):
 # display tweaks
 LOGIN_MESSAGE = "Log in with my NetID"
 
-def _get_service_url(request):
+def _get_service_url():
   # FIXME current URL
   from auth.views import after
   from django.conf import settings
@@ -37,7 +37,7 @@ def _get_service_url(request):
   return settings.URL_HOST + reverse(after)
   
 def get_auth_url(request):
-  return CAS_URL + 'login?service=' + urllib.quote(_get_service_url(request))
+  return CAS_URL + 'login?service=' + urllib.quote(_get_service_url())
 
 def get_user_category(user_id):
   theurl = CAS_ELIGIBILITY_URL % user_id
@@ -106,7 +106,7 @@ def get_user_info_after_auth(request):
 
   # fetch the information from the CAS server
   val_url = CAS_URL + "validate" + \
-     '?service=' + urllib.quote(_get_service_url(request)) + \
+     '?service=' + urllib.quote(_get_service_url()) + \
      '&ticket=' + urllib.quote(ticket)
   r = urllib.urlopen(val_url).readlines()   # returns 2 lines
 
@@ -121,11 +121,11 @@ def get_user_info_after_auth(request):
   else:
     return None
     
-def do_logout(request):
+def do_logout(user):
   """
   Perform logout of CAS by redirecting to the CAS logout URL
   """
-  return HttpResponseRedirect(CAS_LOGOUT_URL % _get_service_url(request))
+  return HttpResponseRedirect(CAS_LOGOUT_URL % _get_service_url())
   
 def update_status(token, message):
   """

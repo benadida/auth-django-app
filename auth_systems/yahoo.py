@@ -29,7 +29,7 @@ def get_user_info_after_auth(request):
 
   return {'type' : 'yahoo', 'user_id': data['ax']['email'][0], 'name': data['ax']['fullname'][0], 'info': {}, 'token':{}}
     
-def do_logout(request):
+def do_logout(user):
   """
   logout of Yahoo
   """
