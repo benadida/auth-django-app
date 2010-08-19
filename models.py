@@ -81,6 +81,11 @@ class User(models.Model):
     if AUTH_SYSTEMS.has_key(self.user_type):
       subject = subject.split("\n")[0]
       AUTH_SYSTEMS[self.user_type].send_message(self.user_id, self.info, subject, body)
+
+  def send_short_message(self, message):
+    if AUTH_SYSTEMS.has_key(self.user_type):
+      if hasattr(AUTH_SYSTEMS[self.user_type], 'send_short_message'):
+        AUTH_SYSTEMS[self.user_type].send_short_message(self.user_id, self.info, message)
   
   def is_eligible_for(self, eligibility_case):
     """

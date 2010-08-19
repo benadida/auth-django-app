@@ -9,6 +9,7 @@ from django.http import *
 from django.core.urlresolvers import reverse
 
 from view_utils import *
+from auth.security import get_user
 
 import auth_systems
 from auth_systems import AUTH_SYSTEMS
@@ -165,6 +166,18 @@ def after(request):
   else:
     # we were logging out
     pass
-  
+
+  # does the auth system want to present an additional view?
+  # this is, for example, to prompt the user to follow @heliosvoting
+  # so they can hear about election results
+  if hasattr(system, 'user_needs_intervention'):
+    intervention_response = system.user_needs_intervention(user['user_id'], user['info'], user['token'])
+    if intervention_response:
+      return intervention_response
+
+  # go to the after intervention page. This is for modularity
+  return HttpResponseRedirect(reverse(after_intervention))
+
+def after_intervention(request):
   return HttpResponseRedirect(request.session['auth_return_url'] or "/")
 

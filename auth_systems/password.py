@@ -40,7 +40,6 @@ def password_login_view(request):
   from auth.view_utils import render_template
   from auth.views import after
   from auth.models import User
-  from django.http import HttpResponseRedirect
 
   error = None
   

@@ -33,12 +33,6 @@ def facebook_post(url, params):
   full_url = facebook_url(url, None)
   return urllib2.urlopen(full_url, urllib.urlencode(params)).read()
 
-def _get_new_client(session_key=None):
-  fb = Facebook(API_KEY, API_SECRET)
-  if session_key:
-    fb.session_key = session_key
-  return fb
-
 def get_auth_url(request, redirect_url):
   request.session['fb_redirect_uri'] = redirect_url
   return facebook_url('/oauth/authorize', {

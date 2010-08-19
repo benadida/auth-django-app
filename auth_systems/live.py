@@ -1,56 +1,68 @@
 """
-Windows Live Authentication
+Windows Live Authentication using oAuth WRAP,
+so much like Facebook
+
+# NOT WORKING YET because Windows Live documentation and status is unclear. Is it in beta? I think it is.
 """
 
-from django.http import *
-from django.core.mail import send_mail
+import logging
+
 from django.conf import settings
-
-import sys, os, cgi, urllib, urllib2, re
-from xml.etree import ElementTree
-
-from openid import view_helpers
-
-# display tweaks
-LOGIN_MESSAGE = "Log in with my Windows Live Account"
-OPENID_ENDPOINT = 'live.com'
-
-# FIXME!
-TRUST_ROOT = 'http://localhost:8000'
-RETURN_TO = 'http://localhost:8000/auth/after'
-
-def get_auth_url(request):
-  url = view_helpers.start_openid(request.session, OPENID_ENDPOINT, TRUST_ROOT, RETURN_TO)
-  return url
-
-def get_user_info_after_auth(request):
-  data = view_helpers.finish_openid(request.session, request.GET, RETURN_TO)
-
-  import pdb;pdb.set_trace()
-  return data
-    
-def do_logout(request):
-  """
-  logout of Yahoo
-  """
-  return HttpResponseRedirect(CAS_LOGOUT_URL % _get_service_url(request))
+APP_ID = settings.LIVE_APP_ID
+APP_SECRET = settings.LIVE_APP_SECRET
   
-def update_status(token, message):
+import urllib, urllib2, cgi
+
+# some parameters to indicate that status updating is possible
+STATUS_UPDATES = False
+# STATUS_UPDATE_WORDING_TEMPLATE = "Send %s to your facebook status"
+
+# FIXME: move this utils somewhere global, not in Helios
+from helios import utils
+
+def live_url(url, params):
+  if params:
+    return "https://graph.facebook.com%s?%s" % (url, urllib.urlencode(params))
+  else:
+    return "https://graph.facebook.com%s" % url
+
+def live_get(url, params):
+  full_url = live_url(url,params)
+  return urllib2.urlopen(full_url).read()
+
+def live_post(url, params):
+  full_url = live_url(url, None)
+  return urllib2.urlopen(full_url, urllib.urlencode(params)).read()
+
+def get_auth_url(request, redirect_url):
+  request.session['live_redirect_uri'] = redirect_url
+  return live_url('/oauth/authorize', {
+      'client_id': APP_ID,
+      'redirect_uri': redirect_url,
+      'scope': 'publish_stream'})
+    
+def get_user_info_after_auth(request):
+  args = facebook_get('/oauth/access_token', {
+      'client_id' : APP_ID,
+      'redirect_uri' : request.session['fb_redirect_uri'],
+      'client_secret' : API_SECRET,
+      'code' : request.GET['code']
+      })
+
+  access_token = cgi.parse_qs(args)['access_token'][0]
+
+  info = utils.from_json(facebook_get('/me', {'access_token':access_token}))
+
+  return {'type': 'facebook', 'user_id' : info['id'], 'name': info['name'], 'info': info, 'token': {'access_token': access_token}}
+    
+def update_status(user_id, user_info, token, message):
   """
-  simple update
+  post a message to the auth system's update stream, e.g. twitter stream
   """
-  pass
+  result = facebook_post('/me/feed', {
+      'access_token': token['access_token'],
+      'message': message
+      })
 
 def send_message(user_id, user_info, subject, body):
-  """
-  send email, for now just to Princeton
-  """
-  # if the user_id contains an @ sign already
-  # send_mail(subject, body, settings.SERVER_EMAIL, ["%s <%s>" % (name, email)], fail_silently=False)
-  pass
-  
-def check_constraint(constraint, user_info):
-  """
-  for eligibility
-  """
   pass
