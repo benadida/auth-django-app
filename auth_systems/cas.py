@@ -5,8 +5,6 @@ Some code borrowed from
 https://sp.princeton.edu/oit/sdp/CAS/Wiki%20Pages/Python.aspx
 """
 
-# FIXME: move this utils somewhere global, not in Helios
-from helios import utils
 from django.http import *
 from django.core.mail import send_mail
 from django.conf import settings

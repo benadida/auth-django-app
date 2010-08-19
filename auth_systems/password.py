@@ -2,9 +2,6 @@
 Username/Password Authentication
 """
 
-# FIXME: move this utils somewhere global, not in Helios
-from helios import utils
-
 from django.core.urlresolvers import reverse
 from django import forms
 from django.core.mail import send_mail
@@ -86,14 +83,14 @@ def password_forgotten_view(request):
     
     body = """
 
-This is a password reminder from Helios:
+This is a password reminder:
 
 Your username: %s
 Your password: %s
 
 --
-Helios
-""" % (user.user_id, user.info['password'])
+%s
+""" % (user.user_id, user.info['password'], settings.SITE_TITLE)
 
     # FIXME: make this a task
     send_mail('password reminder', body, settings.SERVER_EMAIL, ["%s <%s>" % (user.info['name'], user.info['email'])], fail_silently=False)

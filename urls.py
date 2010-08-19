@@ -1,5 +1,5 @@
 """
-Helios Twitter URLs
+Authentication URLs
 
 Ben Adida (ben@adida.net)
 """

@@ -7,8 +7,7 @@ from oauthclient import client
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 
-# FIXME: move this utils somewhere global, not in Helios
-from helios import utils
+from auth import utils
 
 import logging
 

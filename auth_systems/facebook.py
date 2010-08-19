@@ -16,8 +16,7 @@ import urllib, urllib2, cgi
 STATUS_UPDATES = True
 STATUS_UPDATE_WORDING_TEMPLATE = "Send %s to your facebook status"
 
-# FIXME: move this utils somewhere global, not in Helios
-from helios import utils
+from auth import utils
 
 def facebook_url(url, params):
   if params:
