@@ -131,7 +131,7 @@ def update_status(token, message):
   """
   pass
 
-def send_message(user_id, user_info, subject, body):
+def send_message(user_id, name, user_info, subject, body):
   """
   send email, for now just to Princeton
   """

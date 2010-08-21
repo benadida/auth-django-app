@@ -41,11 +41,11 @@ def update_status(token, message):
   """
   pass
 
-def send_message(user_id, user_info, subject, body):
+def send_message(user_id, user_name, user_info, subject, body):
   """
-  send email, for now just to Princeton
+  send email to yahoo user, user_id is email for yahoo and other openID logins.
   """
-  send_mail(subject, body, settings.SERVER_EMAIL, ["%s <%s>" % (user_id, user_id)], fail_silently=False)
+  send_mail(subject, body, settings.SERVER_EMAIL, ["%s <%s>" % (user_name, user_id)], fail_silently=False)
   
 def check_constraint(constraint, user_info):
   """

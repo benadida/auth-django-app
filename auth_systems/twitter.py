@@ -50,9 +50,6 @@ def get_user_info_after_auth(request):
     
   user_info = utils.from_json(twitter_client.oauth_request('http://api.twitter.com/1/account/verify_credentials.json', args={}, method='GET'))
   
-  import logging
-  logging.debug(user_info)
-    
   return {'type': 'twitter', 'user_id' : user_info['screen_name'], 'name': user_info['name'], 'info': user_info, 'token': access_token}
     
 
@@ -78,7 +75,7 @@ def update_status(user_id, user_info, token, message):
   twitter_client = _get_client_by_token(token)
   result = twitter_client.oauth_request('http://api.twitter.com/1/statuses/update.json', args={'status': message}, method='POST')
 
-def send_message(user_id, user_info, subject, body):
+def send_message(user_id, user_name, user_info, subject, body):
   pass
 
 def send_short_message(user_id, user_info, message):

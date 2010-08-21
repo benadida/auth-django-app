@@ -62,5 +62,5 @@ def update_status(user_id, user_info, token, message):
       'message': message
       })
 
-def send_message(user_id, user_info, subject, body):
+def send_message(user_id, user_name, user_info, subject, body):
   pass
